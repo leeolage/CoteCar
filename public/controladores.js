@@ -5,6 +5,14 @@ app.controller('CadastroController',['$scope','$http',function($scope, $http){
 	$scope.inserirUsuario = function(){
 		if($scope.frm.$valid){
 			//formulário válido, pode inserir
+			$http.post('http://localhost:8081/cadastro', $scope.cadastro).then(
+				function(response){
+					alert('Usuário inserido com sucesso!');
+				},
+				function(response){
+					alert('Erro ao inserir usuário');
+				}
+			);
 			$scope.limparNovo();
 		}else{
 			//Erro
@@ -16,7 +24,7 @@ app.controller('CadastroController',['$scope','$http',function($scope, $http){
 	}
    
 	$scope.limparNovo = function(){
-		$scope.cadastro = {id:'',nome:'',nota:1,conteudo:''};
+		$scope.cadastro = {usuario: '', email: '', nome: '', sexo: '', senha: '', receberEmail: ''};
 		$scope.frm.$setPristine();
 	}
 }]); //fim do controlador
