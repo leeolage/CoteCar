@@ -1,19 +1,44 @@
 var app = angular.module('pw2App', []); 
 app.controller('CadastroController',['$scope','$http',function($scope, $http){
-	$scope.cadastro = {usuario: '', email: '', nome: '', sexo: '', senha: '', receberEmail: ''};
+	$scope.cadastro = {codigo: 0, usuario: '', email: '', nome: '', sexo: '', senha: '', receberEmail: ''};
 	
 	$scope.inserirUsuario = function(){
 		if($scope.frm.$valid){
 			//formulário válido, pode inserir
-			$http.post('http://localhost:8081/cadastro', $scope.cadastro).then(
+			$http.get('http://localhost:8081/cadastro').then(
 				function(response){
-					alert('Usuário inserido com sucesso!');
+					var usuarios = response.data;
+					
+					if(usuarios.length > 0){
+						var maxCod = 0;
+						var usuario;
+						for(usuario in usuarios){
+							if(usuarios[usuario].codigo > maxCod){
+								maxCod++;
+							}
+						}
+						
+						$scope.cadastro["codigo"] = maxCod + 1;
+					}
+					else{
+						$scope.cadastro["codigo"] = 1;
+					}
+					
+					$http.post('http://localhost:8081/cadastro', $scope.cadastro).then(
+						function(response){
+							alert('Usuário inserido com sucesso!');
+						},
+						function(response){
+							alert('Erro ao inserir usuário');
+						}
+					);
+					
+					$scope.limparNovo();
 				},
-				function(response){
-					alert('Erro ao inserir usuário');
+				function(error){
+					alert('Erro ao adicionar usuario');
 				}
 			);
-			$scope.limparNovo();
 		}else{
 			//Erro
 			$scope.frm.usuario.$setDirty();

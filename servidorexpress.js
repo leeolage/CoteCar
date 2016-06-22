@@ -12,8 +12,13 @@ var port = 8081;
 app.use(express.static('public'));
 
 app.get('/cadastro', function(req, res, next){
-	res.status(200);
-	res.send('Método Get');
+	fs.readFile('public/user.json', 'utf-8', function(err, data){
+		var usuarios = JSON.parse(data);
+		
+		res.status(200);
+		
+		res.send(usuarios);
+	});
 });
 
 app.post('/cadastro', function(req, res, next){
