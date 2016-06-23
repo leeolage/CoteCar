@@ -11,55 +11,6 @@ var port = 8081;
 
 app.use(express.static('public'));
 
-app.get('/cadastro', function(req, res, next){
-	fs.readFile('public/user.json', 'utf-8', function(err, data){
-		var usuarios = JSON.parse(data);		
-		res.status(200);		
-		res.send(usuarios);
-	});
-});
-
-app.get('/cadastro/:pos', function(req, res, next){
-	fs.readFile('public/user.json', 'utf-8', function(err, data){
-		var usuarios = JSON.parse(data);
-		var usuario;
-		var codigo = parseInt(req.params.pos);
-		for(usuario in usuarios){
-			if(usuarios[usuario].codigo == codigo){
-				res.status(200);				
-				return res.send(usuarios[usuario]);
-			}
-		}
-		
-		res.status(404);
-	});
-	
-});
-
-app.delete('/cadastro/:pos', function(req, res, next){
-	fs.readFile('public/user.json', 'utf-8', function(err, data){
-		var usuarios = JSON.parse(data);
-		var usuario;
-		var codigo = parseInt(req.params.pos);
-		for(usuario in usuarios){
-			console.log(1);
-			if(usuarios[usuario].codigo == codigo){
-				usuarios.splice(usuario, 1);
-		
-				fs.writeFile('public/user.json', JSON.stringify(usuarios), 'utf-8', function(err){
-					if(err){
-						return console.log(err);
-					}
-					console.log('gravado user.json');
-				
-					res.status(204);
-				});
-			}
-		}
-	});
-	
-});
-
 app.post('/cadastro', function(req, res, next){
 	var func = req.body;
 	fs.readFile('public/user.json', 'utf-8', function(err, data){
@@ -73,6 +24,79 @@ app.post('/cadastro', function(req, res, next){
 			console.log('gravado user.json');
 		});
 		res.sendStatus(201);
+	});
+});
+
+app.get('/cadastro', function(req, res, next){
+	fs.readFile('public/user.json', 'utf-8', function(err, data){
+		var usuarios = JSON.parse(data);		
+		res.status(200);		
+		res.send(usuarios);
+	});
+});
+
+app.get('/cadastro/:pos', function(req, res, next){
+	var codigo = parseInt(req.params.pos);
+	fs.readFile('public/user.json', 'utf-8', function(err, data){
+		var usuariosCadastrados = JSON.parse(data);
+		for(usuario in usuariosCadastrados){
+			if(usuariosCadastrados[usuario].codigo == codigo){				
+				return res.status(200).send(usuariosCadastrados[usuario]);
+			}
+		}		
+		res.status(404);
+		res.send('Usuário não encontrado');
+	});
+});
+
+app.put('/cadastro/:pos', function(req, res, next){
+	var func = req.body;
+	var codigo = parseInt(req.params.pos);
+	fs.readFile('public/user.json', 'utf-8', function(err, data){
+		var usuariosCadastrados = JSON.parse(data);
+		var usuarioExiste = false;
+		for(usuario in usuariosCadastrados){
+			if(usuariosCadastrados[usuario].codigo == codigo){
+				usuariosCadastrados[usuario] = func;
+				usuarioExiste = true;
+			}
+		}
+		if(usuarioExiste){
+			fs.writeFile('public/user.json', JSON.stringify(usuariosCadastrados), 'utf-8', function(err){
+				if(err){
+					return console.log(err);
+				}
+				console.log('gravado user.json');
+			});
+			res.sendStatus(201);
+		}else{
+			res.status(404).send('Usuário não existe.');
+		}
+	});
+});
+
+app.delete('/cadastro/:pos', function(req, res, next){
+	var codigo = parseInt(req.params.pos);
+	fs.readFile('public/user.json', 'utf-8', function(err, data){
+		var usuariosCadastrados = JSON.parse(data);
+		var usuarioExiste = false;
+		for(usuario in usuariosCadastrados){
+			if(usuariosCadastrados[usuario].codigo == codigo){
+				usuariosCadastrados.splice(usuario, 1);
+				usuarioExiste = true;
+			}
+		}
+		if(usuarioExiste){
+			fs.writeFile('public/user.json', JSON.stringify(usuariosCadastrados), 'utf-8', function(err){
+				if(err){
+					return console.log(err);
+				}
+				console.log('gravado user.json');
+			});
+			res.sendStatus(204);
+		}else{
+			res.status(404).send('Usuário não existe.');
+		}
 	});
 });
 
