@@ -3,8 +3,16 @@ app.controller('CadastroController',['$scope','$http',function($scope, $http){
 	$scope.cadastro = {codigo: 0, usuario: '', email: '', nome: '', sexo: '', senha: '', receberEmail: ''};
 	
 	$scope.inserirUsuario = function(){
+		//formulário válido, pode inserir
+		$http.delete('http://localhost:8081/cadastro/3').then(
+			function(response){
+				alert('Usuário excluído com sucesso');
+			},			
+			function(response){
+				alert('Erro ao excluir usuário');
+			}
+		);
 		if($scope.frm.$valid){
-			//formulário válido, pode inserir
 			$http.get('http://localhost:8081/cadastro').then(
 				function(response){
 					var usuarios = response.data;

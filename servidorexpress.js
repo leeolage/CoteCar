@@ -13,12 +13,51 @@ app.use(express.static('public'));
 
 app.get('/cadastro', function(req, res, next){
 	fs.readFile('public/user.json', 'utf-8', function(err, data){
-		var usuarios = JSON.parse(data);
-		
-		res.status(200);
-		
+		var usuarios = JSON.parse(data);		
+		res.status(200);		
 		res.send(usuarios);
 	});
+});
+
+app.get('/cadastro/:pos', function(req, res, next){
+	fs.readFile('public/user.json', 'utf-8', function(err, data){
+		var usuarios = JSON.parse(data);
+		var usuario;
+		var codigo = parseInt(req.params.pos);
+		for(usuario in usuarios){
+			if(usuarios[usuario].codigo == codigo){
+				res.status(200);				
+				return res.send(usuarios[usuario]);
+			}
+		}
+		
+		res.status(404);
+	});
+	
+});
+
+app.delete('/cadastro/:pos', function(req, res, next){
+	fs.readFile('public/user.json', 'utf-8', function(err, data){
+		var usuarios = JSON.parse(data);
+		var usuario;
+		var codigo = parseInt(req.params.pos);
+		for(usuario in usuarios){
+			console.log(1);
+			if(usuarios[usuario].codigo == codigo){
+				usuarios.splice(usuario, 1);
+		
+				fs.writeFile('public/user.json', JSON.stringify(usuarios), 'utf-8', function(err){
+					if(err){
+						return console.log(err);
+					}
+					console.log('gravado user.json');
+				
+					res.status(204);
+				});
+			}
+		}
+	});
+	
 });
 
 app.post('/cadastro', function(req, res, next){
